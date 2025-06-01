@@ -102,12 +102,13 @@ def encode_categorical_data(X, y=None, is_training=True):
         if X_encoded[col].dtype == 'object':
             if is_training:
                 le = LabelEncoder()
+                X_encoded[col] = X_encoded[col].fillna('unknown')
                 X_encoded[col] = le.fit_transform(X_encoded[col].astype(str))
                 label_encoders[col] = le
             else:
                 if col in label_encoders:
                     le = label_encoders[col]
-                    X_encoded[col] = X_encoded[col].astype(str)
+                    X_encoded[col] = X_encoded[col].fillna('unknown').astype(str)
                     encoded_values = []
                     for val in X_encoded[col]:
                         if val in le.classes_:
@@ -243,15 +244,13 @@ def make_predictions():
         result_text.insert(tk.END, f"Samples: {len(predictions)} (cleaned data)\n")
         result_text.insert(tk.END, f"Type: {model_type.title()}\n\n")
         
-        # Sample predictions
-        result_text.insert(tk.END, "Sample Predictions:\n")
-        for i in range(min(10, len(predictions))):
+        # Show ALL predictions
+        result_text.insert(tk.END, "All Predictions:\n")
+        for i in range(len(predictions)):
             if model_type == 'classification':
-                result_text.insert(tk.END, f"  {i+1}: {predictions[i]}\n")
+                result_text.insert(tk.END, f"  Student {i+1}: {predictions[i]}\n")
             else:
-                result_text.insert(tk.END, f"  {i+1}: {predictions[i]:.2f}\n")
-        if len(predictions) > 10:
-            result_text.insert(tk.END, f"  ... and {len(predictions) - 10} more\n")
+                result_text.insert(tk.END, f"  Student {i+1}: {predictions[i]:.2f}\n")
         
         # Statistics
         result_text.insert(tk.END, f"\nStatistics:\n")
